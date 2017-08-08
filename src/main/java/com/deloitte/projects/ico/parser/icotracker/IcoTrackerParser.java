@@ -7,6 +7,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,22 +27,24 @@ public class IcoTrackerParser implements IcoParser {
 
     private void parseListOfIcos(List<IcoTrackerIco> icos) {
         //parse icos from "Current"
-        parseIcos(icos, link);
+        parseIcos(icos, link, "current");
 
         //parse icos from "Upcoming"
-        parseIcos(icos, link + "/upcoming");
+        parseIcos(icos, link, "upcoming");
 
         //parse icos from "Past"
-        parseIcos(icos, link + "/past");
+        parseIcos(icos, link, "past");
     }
 
-    private void parseIcos(List<IcoTrackerIco> icos, String link) {
+    private void parseIcos(List<IcoTrackerIco> icos, String link, String status) {
         try {
-            Document site = Jsoup.connect(link).timeout(10*1000).get();
+            Document site = Jsoup.connect(link+"/"+status).timeout(10*1000).get();
             Elements cards = site.select(".card-block");
 
             for (Element c : cards) {
                 IcoTrackerIco ico = new IcoTrackerIco();
+
+                ico.setStatus(status);
 
                 parseIcoDataFromTop(c.select(".cp-top").first(), ico);
                 parseIcoDataFromBody(c.select(".cp-body").first(), ico);
@@ -93,7 +98,22 @@ public class IcoTrackerParser implements IcoParser {
         Elements description = footer.select(".cp-descr .row");
         for(Element e : description){
             String html = e.html();
-            if(html.contains("UTC")) ico.setDate(e.select("span").first().text());
+            if(html.contains("UTC")) {
+                String date = e.select("span").first().text();
+                ico.setIcoDate(date);
+
+                String[] splitted = date.split(" ");
+                if(splitted.length > 2){
+                    String start = splitted[0];
+                    String end = splitted[splitted.length - 1];
+
+                    Date startDate = Date.valueOf(LocalDate.parse(start, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                    Date endDate = Date.valueOf(LocalDate.parse(end, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+
+                    ico.setStartDate(startDate);
+                    ico.setEndDate(endDate);
+                }
+            }
             else if(html.contains("Bonus")) {
                 Element scum = e.select("h3").first();
                 if(scum != null) ico.setDetails(scum.text());

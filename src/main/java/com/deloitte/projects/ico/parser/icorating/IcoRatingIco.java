@@ -2,6 +2,8 @@ package com.deloitte.projects.ico.parser.icorating;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name="ICORATING")
@@ -11,6 +13,10 @@ public class IcoRatingIco implements Serializable{
     @Column(name="id")
     private int id;
 
+    private String project = "";
+    private String status = "";
+    @Column(length = 1500)
+    private String links = "";
     private String hypeScore = "";
     private String riskScore = "";
     private String investScore = "";
@@ -41,8 +47,8 @@ public class IcoRatingIco implements Serializable{
     private String theSourceCode = "";
     private String rating = "";
     private String reportLink = "";
-    private long startDate;
-    private long endDate;
+    private Date startDate;
+    private Date endDate;
 
     public String getHypeScore() {
         return hypeScore;
@@ -233,19 +239,19 @@ public class IcoRatingIco implements Serializable{
         return this;
     }
 
-    public long getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(long startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    public long getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(long endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 
@@ -255,6 +261,30 @@ public class IcoRatingIco implements Serializable{
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getProject() {
+        return project;
+    }
+
+    public void setProject(String project) {
+        this.project = project;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getLinks() {
+        return links;
+    }
+
+    public void setLinks(String links) {
+        this.links = links;
     }
 
     @Override

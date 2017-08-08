@@ -2,6 +2,7 @@ package com.deloitte.projects.ico.parser.icotracker;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Date;
 
 @Entity
 @Table(name="ICOTRACKER")
@@ -12,6 +13,7 @@ public class IcoTrackerIco implements Serializable{
     private int id;
 
     private String project;
+    private String status;
     private String description;
     private String icoTrackerLink;
     private String launch;
@@ -20,10 +22,11 @@ public class IcoTrackerIco implements Serializable{
     private String escrow;
     private String website;
     private String cpIco;
-    private String date;
+    private String icoDate;
     private String details;
-
     private String ico_user;
+    private Date startDate;
+    private Date endDate;
 
     public String getProject() {
         return project;
@@ -105,12 +108,12 @@ public class IcoTrackerIco implements Serializable{
         this.cpIco = cpIco;
     }
 
-    public String getDate() {
-        return date;
+    public String getIcoDate() {
+        return icoDate;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setIcoDate(String icoDate) {
+        this.icoDate = icoDate;
     }
 
     public String getDetails() {
@@ -129,6 +132,30 @@ public class IcoTrackerIco implements Serializable{
         this.id = id;
     }
 
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return "IcoTrackerIco{" +
@@ -142,7 +169,7 @@ public class IcoTrackerIco implements Serializable{
                 ", website='" + website + '\'' +
                 ", ico_user='" + ico_user + '\'' +
                 ", cpIco='" + cpIco + '\'' +
-                ", date='" + date + '\'' +
+                ", icoDate='" + icoDate + '\'' +
                 ", details='" + details + '\'' +
                 '}';
     }

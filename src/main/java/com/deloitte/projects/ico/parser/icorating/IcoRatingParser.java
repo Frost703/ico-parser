@@ -8,6 +8,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,41 +17,62 @@ import java.util.List;
 public class IcoRatingParser implements IcoParser {
     private static final String link = "http://icorating.com";
 
+    private List<String> ongoing;
+    private List<String> past;
+    private List<String> upcoming;
+    private List<String> scum;
+
     public List<IcoRatingIco> parse(){
-        List<String> links = parseListOfIcoLinks();
-        List<IcoRatingIco> icos = parseListOfIcoFromLinks(links);
+        parseListOfIcoLinks();
+        List<IcoRatingIco> icos = parseListOfIcoFromLinks(ongoing, "current");
+        icos.addAll(parseListOfIcoFromLinks(upcoming, "upcoming"));
+        icos.addAll(parseListOfIcoFromLinks(past, "past"));
+        icos.addAll(parseListOfIcoFromLinks(scum, "scum"));
 
         return icos;
     }
 
     //get all ICO links from the website
-    private List<String> parseListOfIcoLinks(){
-        List<String> icos = new ArrayList<String>(300);
+    private void parseListOfIcoLinks(){
         try {
             Document site = Jsoup.connect(link).timeout(10*1000).get();
 
-
-            Elements links = site.select(".ico-projects-table tr");
-            for(Element e : links){
-                String ico = e.attr("data-href");
-                if(ico != null && ico.length() > 1){
-                    icos.add(ico);
-                }
-            }
+            //get ongoing links
+            ongoing = getListOfLinksFromElements(site.select("div[data-idx=0]"));
+            past = getListOfLinksFromElements(site.select("div[data-idx=2]"));
+            upcoming = getListOfLinksFromElements(site.select("div[data-idx=1]"));
+            scum = getListOfLinksFromElements(site.select("div[data-idx=3]"));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return icos;
+    }
+
+    private List<String> getListOfLinksFromElements(Elements elem){
+        ArrayList<String> list = new ArrayList<>(100);
+
+        Elements links = elem.select(".ico-projects-table tr");
+        for(Element e : links){
+            String ico = e.attr("data-href");
+            if(ico != null && ico.length() > 1){
+                list.add(ico);
+            }
+        }
+
+        return list;
     }
 
     //get ico objects from links
-    private List<IcoRatingIco> parseListOfIcoFromLinks(List<String> links){
+    private List<IcoRatingIco> parseListOfIcoFromLinks(List<String> links, String status){
         List<IcoRatingIco> icos = new ArrayList<>(300);
         for(String website : links){
             try{
                 Document site = Jsoup.connect(link+website).timeout(10*1000).get();
                 IcoRatingIco ico = new IcoRatingIco();
+                ico.setStatus(status);
+
+                String project = site.select("div.ico-name-title").first().text();
+                ico.setProject(project);
 
                 setValuesFromContent(ico, site.select(".ico-card-content").first());
                 setValuesFromProjectDetails(ico, site.select("#tab-1").first());
@@ -83,6 +105,15 @@ public class IcoRatingParser implements IcoParser {
             else if(title.contains("Description")) ico.setDescription(value);
             else if(title.contains("Founded")) ico.setFounded(value);
             else if(title.contains("Website")) ico.setWebsite(value);
+            else if(title.contains("Social")){
+                Elements links = r.select(".ico-card-table__td").last().select("a");
+                StringBuilder builder = new StringBuilder();
+                for(Element link : links){
+                    builder.append(link.attr("href")).append("   ,   ");
+                }
+
+                ico.setLinks(builder.toString());
+            }
         }
 
         Element reportLink = overview.select(".ico-card-report a").first();
@@ -126,8 +157,8 @@ public class IcoRatingParser implements IcoParser {
                         int day = Integer.parseInt(startDate.substring(0, firstDot));
                         int month = Integer.parseInt(startDate.substring(firstDot + 1, lastDot));
                         int year = Integer.parseInt(startDate.substring(lastDot + 1, startDate.length()));
-                        LocalDate start = LocalDate.of(year, month, day);
-                        ico.setStartDate(start.toEpochDay());
+                        Date start = Date.valueOf(LocalDate.of(year, month, day));
+                        ico.setStartDate(start);
                     }
 
                     if(date.length > 2) {
@@ -139,8 +170,8 @@ public class IcoRatingParser implements IcoParser {
                             int day = Integer.parseInt(endDate.substring(0, firstDot));
                             int month = Integer.parseInt(endDate.substring(firstDot + 1, lastDot));
                             int year = Integer.parseInt(endDate.substring(lastDot + 1, endDate.length()));
-                            LocalDate end = LocalDate.of(year, month, day);
-                            ico.setEndDate(end.toEpochDay());
+                            Date end = Date.valueOf(LocalDate.of(year, month, day));
+                            ico.setEndDate(end);
                         }
                     }
                 }
