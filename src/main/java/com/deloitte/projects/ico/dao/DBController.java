@@ -6,7 +6,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 public class DBController {
-    //TODO add and setup hibernate to work with postgres. Add basic operations to add entities to db.
     //make it create a new instance of tables every run.
 
     private static final SessionFactory factory = new Configuration().configure().buildSessionFactory();

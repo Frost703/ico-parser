@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 //parser for http://icorating.com/
-public class IcoRatingParser implements IcoParser {
+public class IcoRatingParser implements IcoParser<IcoRatingIco> {
     private static final String link = "http://icorating.com";
 
     private List<String> ongoing;

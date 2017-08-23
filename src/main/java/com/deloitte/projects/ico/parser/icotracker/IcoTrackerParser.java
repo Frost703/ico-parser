@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 //parser for icotracker.net
-public class IcoTrackerParser implements IcoParser {
+public class IcoTrackerParser implements IcoParser<IcoTrackerIco> {
     private static final String link = "https://icotracker.net";
 
     @Override

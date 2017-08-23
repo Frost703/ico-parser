@@ -22,6 +22,7 @@
 
         <mapping class="com.deloitte.projects.ico.parser.icorating.IcoRatingIco"/>
         <mapping class="com.deloitte.projects.ico.parser.icotracker.IcoTrackerIco"/>
+        <mapping class="com.deloitte.projects.ico.parser.tokenmarket.TokenMarketIco"/>
 
     </session-factory>
 </hibernate-configuration>
