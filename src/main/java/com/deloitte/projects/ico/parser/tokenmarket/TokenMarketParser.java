@@ -27,15 +27,19 @@ public class TokenMarketParser implements IcoParser<TokenMarketIco> {
                                     .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
                                     .referrer("http://www.google.com")
                                     .get();
+            System.out.println("Parsing " + link);
+
             Elements rows = website.select("table.table-assets tr");
             for(Element r : rows){
                 String link = r.select("a.logo-link").attr("href");
-                if(link != null && link.length() > 0)
+                if(link != null && link.length() > 0){
                     icos.add(getIcoFromLink(link.trim()));
+                }
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Read timeout at TokenMarketParser subsite. Trying again...");
+            parseListOfIcos();
         }
 
         return icos;
@@ -49,6 +53,7 @@ public class TokenMarketParser implements IcoParser<TokenMarketIco> {
                     .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
                     .referrer("http://www.google.com")
                     .get();
+            System.out.println("Pasring "+href);
 
             ico.setName(site.select("div.col-md-6 h1").text());
             ico.setLead(site.select("p.lead").text());
@@ -115,7 +120,8 @@ public class TokenMarketParser implements IcoParser<TokenMarketIco> {
                     ico.setCommits(s.select("td").text());
             }
         } catch (IOException ioe){
-            ioe.printStackTrace();
+            System.out.println("Read timeout at TokenMarketParser subsite. Trying again...");
+            getIcoFromLink(href);
         }
 
         return ico;

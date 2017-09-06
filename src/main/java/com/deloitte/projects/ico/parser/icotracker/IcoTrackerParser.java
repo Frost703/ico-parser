@@ -38,7 +38,13 @@ public class IcoTrackerParser implements IcoParser<IcoTrackerIco> {
 
     private void parseIcos(List<IcoTrackerIco> icos, String link, String status) {
         try {
-            Document site = Jsoup.connect(link+"/"+status).timeout(10*1000).get();
+            Document site = Jsoup.connect(link+"/"+status).timeout(30*1000)
+                    .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
+                    .referrer("http://www.google.com")
+                    .get();
+
+            System.out.println("Parsing " + link+"/"+status);
+
             Elements cards = site.select(".card-block");
 
             for (Element c : cards) {
@@ -48,12 +54,13 @@ public class IcoTrackerParser implements IcoParser<IcoTrackerIco> {
 
                 parseIcoDataFromTop(c.select(".cp-top").first(), ico);
                 parseIcoDataFromBody(c.select(".cp-body").first(), ico);
-                parseIcoDataFromFooter(c.select(".cp-footer").first(), ico);
+                parseIcoDataFromFooter(c.select(".cp-body .cp-info").first(), ico);
 
                 icos.add(ico);
             }
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            System.out.println("Read timeout at IcoTrackerParser subsite. Trying again...");
+            parseIcos(icos, link, status);
         }
     }
 
@@ -95,7 +102,7 @@ public class IcoTrackerParser implements IcoParser<IcoTrackerIco> {
     }
 
     private void parseIcoDataFromFooter(Element footer, IcoTrackerIco ico) {
-        Elements description = footer.select(".cp-descr .row");
+        Elements description = footer.select("div.cp-row-sm.row").not("div.cp-info-i div.cp-row-sm.row");
         for(Element e : description){
             String html = e.html();
             if(html.contains("UTC")) {

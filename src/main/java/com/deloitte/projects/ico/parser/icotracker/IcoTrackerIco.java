@@ -12,19 +12,20 @@ public class IcoTrackerIco implements Serializable{
     @Column(name="id")
     private int id;
 
-    private String project;
-    private String status;
-    private String description;
-    private String icoTrackerLink;
-    private String launch;
-    private String base;
-    private String whitepaper;
-    private String escrow;
-    private String website;
-    private String cpIco;
-    private String icoDate;
-    private String details;
-    private String ico_user;
+    private String project="";
+    private String status="";
+    private String description="";
+    private String icoTrackerLink="";
+    private String launch="";
+    private String base="";
+    @Column(length = 1000)
+    private String whitepaper="";
+    private String escrow="";
+    private String website="";
+    private String cpIco="";
+    private String icoDate="";
+    private String details="";
+    private String ico_user="";
     private Date startDate;
     private Date endDate;
 
@@ -159,18 +160,22 @@ public class IcoTrackerIco implements Serializable{
     @Override
     public String toString() {
         return "IcoTrackerIco{" +
-                "project='" + project + '\'' +
-                ", description='" + description + '\'' +
-                ", icoTrackerLink='" + icoTrackerLink + '\'' +
-                ", launch='" + launch + '\'' +
-                ", base='" + base + '\'' +
-                ", whitepaper='" + whitepaper + '\'' +
-                ", escrow='" + escrow + '\'' +
-                ", website='" + website + '\'' +
-                ", ico_user='" + ico_user + '\'' +
-                ", cpIco='" + cpIco + '\'' +
-                ", icoDate='" + icoDate + '\'' +
-                ", details='" + details + '\'' +
+                "id=" + id +
+                ", project='" + project.length() + '\'' +
+                ", status='" + status.length() + '\'' +
+                ", description='" + description.length() + '\'' +
+                ", icoTrackerLink='" + icoTrackerLink.length() + '\'' +
+                ", launch='" + launch.length() + '\'' +
+                ", base='" + base.length() + '\'' +
+                ", whitepaper='" + whitepaper.length() + '\'' +
+                ", escrow='" + escrow.length() + '\'' +
+                ", website='" + website.length() + '\'' +
+                ", cpIco='" + cpIco.length() + '\'' +
+                ", icoDate='" + icoDate.length() + '\'' +
+                ", details='" + details.length() + '\'' +
+                ", ico_user='" + ico_user.length() + '\'' +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
                 '}';
     }
 }

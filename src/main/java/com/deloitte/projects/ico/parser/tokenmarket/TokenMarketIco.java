@@ -1,16 +1,27 @@
 package com.deloitte.projects.ico.parser.tokenmarket;
 
+import javax.persistence.*;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.Month;
 
+@Entity
+@Table(name="TOKENMARKET")
 public class TokenMarketIco {
+    @Id
+    @GeneratedValue
+    @Column(name="id")
+    private int id;
+
     private String name;
     private String lead;
     private String symbol;
+    @Column(length = 5000)
     private String concept;
     private String technology;
+    @Column(length = 2000)
     private String team;
+    @Column(length = 1000)
     private String links;
     private String domainScore;
     private String backlinksScore;
@@ -130,6 +141,14 @@ public class TokenMarketIco {
 
         int year = Integer.parseInt(string.substring(lastSpace + 1));
         return Date.valueOf(LocalDate.of(year, jdbcMonth, day));
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override

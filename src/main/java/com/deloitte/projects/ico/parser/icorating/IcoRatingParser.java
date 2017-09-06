@@ -35,15 +35,17 @@ public class IcoRatingParser implements IcoParser<IcoRatingIco> {
     //get all ICO links from the website
     private void parseListOfIcoLinks(){
         try {
-            Document site = Jsoup.connect(link).timeout(10*1000).get();
+            Document site = Jsoup.connect(link).timeout(30*1000).get();
 
+            System.out.println("Parsing " + link);
             //get ongoing links
             ongoing = getListOfLinksFromElements(site.select("div[data-idx=0]"));
             past = getListOfLinksFromElements(site.select("div[data-idx=2]"));
             upcoming = getListOfLinksFromElements(site.select("div[data-idx=1]"));
             scum = getListOfLinksFromElements(site.select("div[data-idx=3]"));
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Read timeout at IcoRatingParser site. Trying again...");
+            parseListOfIcoLinks();
         }
 
     }
@@ -67,7 +69,9 @@ public class IcoRatingParser implements IcoParser<IcoRatingIco> {
         List<IcoRatingIco> icos = new ArrayList<>(300);
         for(String website : links){
             try{
-                Document site = Jsoup.connect(link+website).timeout(10*1000).get();
+                Document site = Jsoup.connect(link+website).timeout(30*1000).get();
+                System.out.println("Parsing " + link+website);
+
                 IcoRatingIco ico = new IcoRatingIco();
                 ico.setStatus(status);
 
@@ -84,7 +88,8 @@ public class IcoRatingParser implements IcoParser<IcoRatingIco> {
 
                 icos.add(ico);
             } catch(IOException ioe) {
-                ioe.printStackTrace();
+                System.out.println("Read timeout at IcoRatingParser subsite. Trying again...");
+                parseListOfIcoFromLinks(links, status);
             }
         }
 
@@ -149,29 +154,17 @@ public class IcoRatingParser implements IcoParser<IcoRatingIco> {
             if(title.contains("date")) {
                 if(value.contains(" ")) {
                     String[] date = value.split(" ");
-                    if(date[0].contains(".")) {
-                        String startDate = date[0];
-                        int firstDot = startDate.indexOf('.');
-                        int lastDot = startDate.lastIndexOf('.');
-
-                        int day = Integer.parseInt(startDate.substring(0, firstDot));
-                        int month = Integer.parseInt(startDate.substring(firstDot + 1, lastDot));
-                        int year = Integer.parseInt(startDate.substring(lastDot + 1, startDate.length()));
-                        Date start = Date.valueOf(LocalDate.of(year, month, day));
-                        ico.setStartDate(start);
+                    if(date[0].contains("T") && date[0].contains(":")){
+                        ico.setStartDate(getISODate(date[0]));
+                    } else if(date[0].contains(".")) {
+                        ico.setStartDate(getDate(date[0]));
                     }
 
                     if(date.length > 2) {
-                        if(date[2].contains(".")) {
-                            String endDate = date[2];
-                            int firstDot = endDate.indexOf('.');
-                            int lastDot = endDate.lastIndexOf('.');
-
-                            int day = Integer.parseInt(endDate.substring(0, firstDot));
-                            int month = Integer.parseInt(endDate.substring(firstDot + 1, lastDot));
-                            int year = Integer.parseInt(endDate.substring(lastDot + 1, endDate.length()));
-                            Date end = Date.valueOf(LocalDate.of(year, month, day));
-                            ico.setEndDate(end);
+                        if(date[2].contains("T") && date[0].contains(":")){
+                            ico.setEndDate(getISODate(date[2]));
+                        } else if(date[2].contains(".")) {
+                            ico.setEndDate(getDate(date[2]));
                         }
                     }
                 }
@@ -208,6 +201,27 @@ public class IcoRatingParser implements IcoParser<IcoRatingIco> {
     private void setValuesFromTeam(IcoRatingIco ico, Element overview){
     }
 
+    private Date getDate(String startDate){
+        int firstDot = startDate.indexOf('.');
+        int lastDot = startDate.lastIndexOf('.');
 
+        int day = Integer.parseInt(startDate.substring(0, firstDot));
+        int month = Integer.parseInt(startDate.substring(firstDot + 1, lastDot));
+        int year = Integer.parseInt(startDate.substring(lastDot + 1, startDate.length()));
+
+        return Date.valueOf(LocalDate.of(year, month, day));
+    }
+
+    private Date getISODate(String startDate){
+        String date = startDate.substring(0, startDate.indexOf("T"));
+        int firstDot = date.indexOf('-');
+        int lastDot = date.lastIndexOf('-');
+
+        int year = Integer.parseInt(date.substring(0, firstDot));
+        int month = Integer.parseInt(date.substring(firstDot + 1, lastDot));
+        int day = Integer.parseInt(date.substring(lastDot + 1, date.length()));
+
+        return Date.valueOf(LocalDate.of(year, month, day));
+    }
 
 }
